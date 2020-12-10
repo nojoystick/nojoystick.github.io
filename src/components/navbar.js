@@ -1,13 +1,34 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { jsx } from '@emotion/react';
 import { colors, type, breakpoints } from '../constants';
-import Resume from '../assets/resume.pdf';
+import { storage, db } from '../firebase';
 
 const Navbar = ({ width, height }) => {
+  const [content, setContent] = useState();
+  const [resume, setResume] = useState([]);
+  useEffect(() => {
+    db.collection('general')
+      .doc('static')
+      .get()
+      .then((result) => {
+        setContent(result.data());
+      });
+  }, []);
+
+  useEffect(() => {
+    content &&
+      content.resume &&
+      storage
+        .child(content.resume)
+        .getDownloadURL()
+        .then((url) => {
+          setResume(url);
+        });
+  }, [content]);
   // const [showNav, setShowNav] = useState(false);
   const styles = {
     navbar: {
@@ -27,7 +48,7 @@ const Navbar = ({ width, height }) => {
       a: {
         color: colors.purple,
         font: type.h4,
-        transition: 'color 1s',
+        transition: 'color 0.5s',
       },
       '&:hover': {
         backgroundColor: colors.purple,
@@ -35,7 +56,7 @@ const Navbar = ({ width, height }) => {
           color: colors.white,
           transition: 'color 1s',
         },
-        transition: 'background-color 1s',
+        transition: 'background-color 0.5s',
       },
     },
   };
@@ -55,7 +76,7 @@ const Navbar = ({ width, height }) => {
         <Link to='/music'>music</Link>
       </li>
       <li css={styles.navItem}>
-        <a href={Resume} target='__blank'>
+        <a href={resume} target='__blank'>
           resume
         </a>
       </li>

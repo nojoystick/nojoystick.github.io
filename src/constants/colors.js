@@ -1,6 +1,7 @@
 const colors = {
   pink: '#FFD1DC',
   darkpink: '#B3818C',
+  offpink: '#ffdfe6',
   purple: '#4B365F',
   lightblue: '#A4DBE8',
   lightred: '#FF7276',

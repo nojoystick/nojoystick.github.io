@@ -1,23 +1,30 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { jsx } from '@emotion/react';
 import { colors, type, breakpoints } from '../../constants';
-import { storage, db } from '../../firebase';
 
 const styles = {
+  parent: {
+    position: 'absolute',
+    left: '0px',
+    top: '100px',
+    height: 'calc(100% - 100px)',
+  },
   title: {
     color: colors.purple,
     font: type.h1,
     margin: '10px',
     display: 'flex',
     justifyContent: 'center',
+    maxWidth: '100%',
   },
   images: {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
+    maxWidth: '100%',
   },
   image: {
     width: '200px',
@@ -26,48 +33,41 @@ const styles = {
   content: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'left',
     font: type.bodySemibold,
     padding: '0px 100px',
+  },
+  contentMobile: {
+    padding: '0px 30px',
   },
   paragraph: {},
 };
 
-const Home = () => {
-  const [content, setContent] = useState();
-  const [imageUrls, setImageUrls] = useState([]);
-  useEffect(() => {
-    db.collection('home')
-      .doc('static')
-      .get()
-      .then((result) => {
-        setContent(result.data());
-      });
-  }, []);
-
-  useEffect(() => {
-    content &&
-      content.photos &&
-      content.photos.forEach((photo) => {
-        storage
-          .child(photo)
-          .getDownloadURL()
-          .then((url) => {
-            setImageUrls((prevState) => [...prevState, url]);
-          });
-      });
-  }, [content]);
+const Home = ({ width, images, content }) => {
+  let isMobile = width < breakpoints.mobile;
 
   return content ? (
-    <div>
+    <div css={styles.parent}>
       <h1 css={styles.title}>{content.title}</h1>
       <div css={styles.images}>
-        {imageUrls &&
-          imageUrls.map((url, index) => {
-            return <img src={url} css={styles.image} key={index} alt='selfy' />;
+        {images &&
+          Object.values(images).map((image, index) => {
+            if (!isMobile || (isMobile && index === 0)) {
+              return <img src={image.src} css={styles.image} alt='selfy' />;
+            }
+            return null;
           })}
       </div>
-      <div css={styles.content}>
+      <div
+        css={
+          isMobile
+            ? {
+                ...styles.content,
+                ...styles.contentMobile,
+              }
+            : styles.content
+        }
+      >
         {content.content &&
           content.content.map((paragraph, index) => {
             return (
@@ -81,6 +81,12 @@ const Home = () => {
   ) : (
     <div />
   );
+};
+
+Home.propTypes = {
+  width: PropTypes.number,
+  images: PropTypes.object,
+  content: PropTypes.object,
 };
 
 export default Home;
