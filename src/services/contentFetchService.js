@@ -11,13 +11,17 @@ class ContentFetchService {
    * @param {string} document
    * @param {string | array} field
    */
-  constructor(collection, document, field) {
+  constructor(collection, document, field, field2) {
     this.collection = collection || 'general';
     this.document = document || 'static';
     this.field = field || 'photos';
     return (async () => {
       await this.getContent();
-      await this.cachePhotos();
+      this.photos = await this.cachePhotos(field);
+      await this.cacheVideo();
+      if (field2) {
+        this.icons = await this.cachePhotos(field2);
+      }
       return this;
     })();
   }
@@ -32,43 +36,64 @@ class ContentFetchService {
       });
   }
 
-  async cachePhotos() {
-    this.photos = {};
-    if (typeof this.field === 'string') {
+  async cachePhotos(field) {
+    let photos = {};
+    if (typeof field === 'string') {
       this.content &&
-        this.content[this.field] &&
-        this.content[this.field].forEach((photo) => {
+        this.content[field] &&
+        this.content[field].forEach((photo) => {
           storage
             .child(photo)
             .getDownloadURL()
             .then((url) => {
               const img = new Image();
               img.src = url;
-              this.photos[photo] = img;
+              photos[photo] = img;
             });
         });
     } else {
       // todo: obvs this will only work for a 2-item array;
       //    should make this work for any size of array
       this.content &&
-        this.content[this.field[0]] &&
-        this.content[this.field[0]].forEach((project) => {
-          project[this.field[1]] &&
-            project[this.field[1]].forEach((photo) => {
+        this.content[field[0]] &&
+        this.content[field[0]].forEach((project) => {
+          project[field[1]] &&
+            project[field[1]].forEach((photo) => {
               storage
                 .child(photo)
                 .getDownloadURL()
                 .then((url) => {
                   const img = new Image();
                   img.src = url;
-                  if (!this.photos[project.title]) {
-                    this.photos[project.title] = {};
+                  if (!photos[project.title]) {
+                    photos[project.title] = {};
                   }
-                  this.photos[project.title][photo] = img;
+                  photos[project.title][photo] = img;
                 });
             });
         });
     }
+    return photos;
+  }
+
+  async cacheVideo() {
+    this.videos = {};
+    this.content &&
+      this.content[this.field[0]] &&
+      this.content[this.field[0]].forEach((project) => {
+        project.video &&
+          storage
+            .child(project.video)
+            .getDownloadURL()
+            .then((url) => {
+              const vid = document.createElement('video');
+              vid.src = url;
+              if (!this.videos[project.title]) {
+                this.photos[project.title] = {};
+              }
+              this.videos[project.title] = vid;
+            });
+      });
   }
 }
 

@@ -4,7 +4,7 @@ const colors = {
   offpink: '#ffdfe6',
   purple: '#4B365F',
   lightblue: '#A4DBE8',
-  lightred: '#FF7276',
+  lightred: '#e8585c',
   white: '#FFFFF5',
   boxShadow: '0px 10px 20px rgba(77, 97, 108, .24)',
   boxShadowLight: '0px 5px 10px rgba(77, 97, 108, .08)',

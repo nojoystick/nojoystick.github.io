@@ -107,6 +107,7 @@ const Loading = ({ show }) => {
       justifyContent: 'center',
       maxWidth: '100%',
       overflow: 'hidden',
+      textAlign: 'center',
     },
     parent: {
       position: 'absolute',
@@ -127,7 +128,7 @@ const Loading = ({ show }) => {
     },
   };
   const fullName = 'elaine williams';
-  const name = useTypewriter(fullName, 30);
+  const name = useTypewriter(fullName, 30, 500);
 
   return (
     <div css={styles.container}>

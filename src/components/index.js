@@ -1,5 +1,5 @@
 import Loading from './loading';
 import Navbar from './navbar';
-import Spotify from './spotify';
+import Linkbar from './linkbar';
 
-export { Loading, Navbar, Spotify };
+export { Loading, Navbar, Linkbar };

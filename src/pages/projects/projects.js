@@ -8,6 +8,14 @@ import { storage } from '../../firebase';
 import Project from './project';
 
 const styles = {
+  parent: {
+    padding: '0px 0px 30px',
+    backgroundColor: colors.pink,
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   title: {
     color: colors.purple,
     font: type.h1,
@@ -32,14 +40,14 @@ const styles = {
   },
 };
 
-const Projects = ({ width, content, images }) => {
+const Projects = ({ width, content, photos, videos }) => {
   let isMobile = width < breakpoints.tablet;
   const [audioUrls, setAudioUrls] = useState([]);
 
   useEffect(() => {
     content &&
       content.projects &&
-      content.projects.forEach((project, index) => {
+      content.projects.forEach((project) => {
         if (project.audio) {
           storage
             .child(project.audio)
@@ -55,7 +63,7 @@ const Projects = ({ width, content, images }) => {
   }, [content]);
 
   return content ? (
-    <div>
+    <div css={styles.parent}>
       <h1 css={styles.title}>projects</h1>
       <div
         css={
@@ -77,10 +85,11 @@ const Projects = ({ width, content, images }) => {
             isMobile={isMobile}
             {...project}
             photos={
-              images &&
-              images[project.title] &&
-              Object.values(images[project.title])
+              photos &&
+              photos[project.title] &&
+              Object.values(photos[project.title])
             }
+            video={videos && videos[project.title]}
             audio={audioUrls.find((el) => el.title === project.title)}
             key={index}
             index={index}
@@ -96,7 +105,8 @@ const Projects = ({ width, content, images }) => {
 Projects.propTypes = {
   width: PropTypes.number,
   content: PropTypes.object,
-  images: PropTypes.object,
+  photos: PropTypes.object,
+  videos: PropTypes.object,
 };
 
 export default Projects;

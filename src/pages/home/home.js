@@ -3,6 +3,9 @@
 import PropTypes from 'prop-types';
 import { jsx } from '@emotion/react';
 import { colors, type, breakpoints } from '../../constants';
+import Linkbar from '../../components/linkbar';
+import github from '../../assets/github.png';
+import blossom from '../../assets/blossom.png';
 
 const styles = {
   parent: {
@@ -10,16 +13,20 @@ const styles = {
     left: '0px',
     top: '100px',
     height: 'calc(100% - 100px)',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: colors.pink,
   },
   title: {
     color: colors.purple,
     font: type.h1,
-    margin: '10px',
-    display: 'flex',
-    justifyContent: 'center',
-    maxWidth: '100%',
+    margin: '10px auto',
+    display: 'inline-block',
+    textAlign: 'center',
   },
-  images: {
+  photos: {
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -27,33 +34,40 @@ const styles = {
     maxWidth: '100%',
   },
   image: {
-    width: '200px',
+    height: '250px',
     margin: '10px',
   },
   content: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'left',
     font: type.bodySemibold,
     padding: '0px 100px',
+    backgroundColor: colors.pink,
+    maxWidth: '420px',
   },
   contentMobile: {
     padding: '0px 30px',
   },
-  paragraph: {},
 };
 
-const Home = ({ width, images, content }) => {
+const Home = ({ width, photos, content }) => {
   let isMobile = width < breakpoints.mobile;
 
   return content ? (
     <div css={styles.parent}>
       <h1 css={styles.title}>{content.title}</h1>
-      <div css={styles.images}>
-        {images &&
-          Object.values(images).map((image, index) => {
+      <div css={styles.photos}>
+        {photos &&
+          Object.values(photos).map((image, index) => {
             if (!isMobile || (isMobile && index === 0)) {
-              return <img src={image.src} css={styles.image} alt='selfy' />;
+              return (
+                <img
+                  src={image.src}
+                  css={styles.image}
+                  alt='selfy'
+                  key={index}
+                />
+              );
             }
             return null;
           })}
@@ -77,6 +91,10 @@ const Home = ({ width, images, content }) => {
             );
           })}
       </div>
+      <Linkbar
+        links={['', 'https://github.com/nojoystick', '']}
+        images={[blossom, github, blossom]}
+      />
     </div>
   ) : (
     <div />
@@ -85,7 +103,7 @@ const Home = ({ width, images, content }) => {
 
 Home.propTypes = {
   width: PropTypes.number,
-  images: PropTypes.object,
+  photos: PropTypes.object,
   content: PropTypes.object,
 };
 

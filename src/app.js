@@ -1,6 +1,7 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { useEffect, useState, Suspense, lazy } from 'react';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 import { jsx } from '@emotion/react';
 import PropTypes from 'prop-types';
 import { colors } from './constants';
@@ -11,7 +12,6 @@ import { useSizeListener, useDelayedUnmount } from './hooks';
 import { ContentFetchService } from './services';
 const Projects = lazy(() => import('./pages/projects/projects'));
 const Music = lazy(() => import('./pages/music/music'));
-const Blog = lazy(() => import('./pages/blog/blog'));
 
 const LOADING_DURATION = 3500;
 const FADE_OUT_DURATION = 1000;
@@ -31,10 +31,12 @@ const App = () => {
   const isMounted = useDelayedUnmount(!isLoaded, FADE_OUT_DURATION);
 
   useEffect(() => {
+    disableBodyScroll(document.body);
     setTimeout(() => {
       setFadeIn(true);
     }, 500);
     setTimeout(() => setIsLoaded(true), LOADING_DURATION);
+    setTimeout(() => enableBodyScroll(document.body), LOADING_DURATION);
   }, []);
   return (
     <div css={{ ...body, opacity: fadeIn ? '1.0' : '0.0' }} id='app'>
@@ -51,6 +53,7 @@ const Paths = ({ width }) => {
   // cache images at the top level for quicker load times
   const [homeContent, setHomeContent] = useState();
   const [projectsContent, setProjectsContent] = useState();
+  const [musicContent, setMusicContent] = useState();
 
   useEffect(() => {
     (async () => {
@@ -59,8 +62,15 @@ const Paths = ({ width }) => {
         'projects',
         'photos',
       ]);
+      const music = await new ContentFetchService(
+        'music',
+        'static',
+        ['songs', 'image'],
+        ['links', 'icon']
+      );
       setHomeContent(home);
       setProjectsContent(projects);
+      setMusicContent(music);
     })();
   }, []);
 
@@ -68,24 +78,13 @@ const Paths = ({ width }) => {
     <Suspense fallback={<Loading show={false} />}>
       <Switch>
         <Route exact path='/'>
-          <Home
-            width={width}
-            content={homeContent && homeContent.content}
-            images={homeContent && homeContent.photos}
-          />
-        </Route>
-        <Route path='/blog'>
-          <Blog />
+          <Home width={width} {...homeContent} />
         </Route>
         <Route path='/music'>
-          <Music />
+          <Music width={width} {...musicContent} />
         </Route>
         <Route path='/projects'>
-          <Projects
-            width={width}
-            content={projectsContent && projectsContent.content}
-            images={projectsContent && projectsContent.photos}
-          />
+          <Projects width={width} {...projectsContent} />
         </Route>
       </Switch>
     </Suspense>

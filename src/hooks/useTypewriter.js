@@ -8,22 +8,28 @@ import { useState, useEffect } from 'react';
  * @param {*} speed - the max speed for a letter in ms
  */
 
-const useTypewriter = (text, speed) => {
+const useTypewriter = (text, speed, delay) => {
   const [name, setName] = useState('');
 
   useEffect(() => {
-    if (text) {
+    const writeText = () => {
       let prev = 0;
       [...text].forEach((char, index) => {
-        let rFactor = Math.floor(Math.random() * 0.2) + 0.8;
+        let rFactor = Math.floor(Math.random() * 0.3) + 0.7;
         let next = prev + speed * index * rFactor;
         setTimeout(() => {
           setName((prev) => prev + char);
         }, next);
         prev = next;
       });
+    };
+
+    if (text) {
+      setTimeout(() => {
+        writeText();
+      }, delay);
     }
-  }, [text, speed]);
+  }, [text, speed, delay]);
 
   return name;
 };

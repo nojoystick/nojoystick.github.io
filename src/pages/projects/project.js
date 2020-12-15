@@ -3,7 +3,6 @@
 import { jsx } from '@emotion/react';
 import github from '../../assets/github.png';
 import deployment from '../../assets/link.png';
-import youtube from '../../assets/youtube.png';
 import { colors, type } from '../../constants';
 import PropTypes from 'prop-types';
 import MediaColumn from './mediaColumn';
@@ -31,6 +30,7 @@ const styles = {
     margin: '0px 100px 20px 100px',
     padding: '30px',
     transition: 'box-shadow 1s',
+    maxWidth: '1000px',
     '&:hover': {
       transition: 'box-shadow 1s',
       boxShadow: colors.boxShadowLight,
@@ -80,9 +80,9 @@ const Project = ({
   info,
   photos,
   repo_link,
-  youtube_link,
   link,
   audio,
+  video,
   index,
 }) => {
   return (
@@ -103,11 +103,6 @@ const Project = ({
             <img css={styles.ghLink} src={github} alt={repo_link} />
           </a>
         )}
-        {youtube_link && (
-          <a href={youtube_link}>
-            <img css={styles.ghLink} src={youtube} alt={link} />
-          </a>
-        )}
         {link && (
           <a href={link}>
             <img css={styles.ghLink} src={deployment} alt={link} />
@@ -125,7 +120,13 @@ const Project = ({
         }
       >
         {index % 2 === 0 && (
-          <MediaColumn audio={audio} photos={photos} title={title} />
+          <MediaColumn
+            isMobile={isMobile}
+            audio={audio}
+            photos={photos}
+            title={title}
+            video={video}
+          />
         )}
         <div
           css={{
@@ -143,7 +144,13 @@ const Project = ({
             })}
         </div>
         {index % 2 === 1 && (
-          <MediaColumn audio={audio} photos={photos} title={title} />
+          <MediaColumn
+            isMobile={isMobile}
+            audio={audio}
+            photos={photos}
+            title={title}
+            video={video}
+          />
         )}
       </div>
     </div>
@@ -157,9 +164,9 @@ Project.propTypes = {
   photos: PropTypes.array,
   repo_link: PropTypes.string,
   link: PropTypes.string,
-  youtube_link: PropTypes.string,
-  audio: PropTypes.string,
+  audio: PropTypes.object,
   index: PropTypes.number,
+  video: PropTypes.object,
 };
 
 export default Project;
