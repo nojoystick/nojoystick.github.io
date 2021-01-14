@@ -65,7 +65,7 @@ const Paths = ({ width }) => {
       const music = await new ContentFetchService(
         'music',
         'static',
-        ['songs', 'image'],
+        ['albums', 'photo'],
         ['links', 'icon']
       );
       setHomeContent(home);

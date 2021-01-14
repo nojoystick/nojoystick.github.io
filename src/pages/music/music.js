@@ -6,6 +6,7 @@ import { jsx } from '@emotion/react';
 import { colors, type, breakpoints } from '../../constants';
 import { Linkbar } from '../../components';
 import { storage } from '../../firebase';
+import './audio.css';
 
 const styles = {
   parent: {
@@ -36,23 +37,39 @@ const styles = {
 const Music = ({ width, photos, content, icons }) => {
   const [audioUrls, setAudioUrls] = useState([]);
 
+  document.addEventListener(
+    'play',
+    function (e) {
+      var audios = document.getElementsByTagName('audio');
+      for (var i = 0, len = audios.length; i < len; i++) {
+        if (audios[i] !== e.target) {
+          audios[i].pause();
+        }
+      }
+    },
+    true
+  );
+
   useEffect(() => {
     content &&
-      content.songs &&
-      content.songs.forEach((song) => {
-        if (song.file) {
-          storage
-            .child(song.file)
-            .getDownloadURL()
-            .then((url) => {
-              setAudioUrls((prevState) => [
-                ...prevState,
-                { title: song.title, url: url },
-              ]);
-            });
-        }
+      content.albums &&
+      content.albums.forEach((album) => {
+        album.songs.forEach((song) => {
+          if (song.file) {
+            storage
+              .child(song.file)
+              .getDownloadURL()
+              .then((url) => {
+                setAudioUrls((prevState) => [
+                  ...prevState,
+                  { album: album.title, title: song.title, url: url },
+                ]);
+              });
+          }
+        });
       });
   }, [content]);
+
   let isMobile = width < breakpoints.tablet;
   const links = [];
   const imgs = [];
@@ -66,16 +83,18 @@ const Music = ({ width, photos, content, icons }) => {
     <div css={styles.parent}>
       <h1 css={styles.title}>{content.title}</h1>
       <Linkbar links={links} images={imgs} backed={true} />
-      {content.songs.map((song, index) => {
+      {content.albums.map((album, index) => {
         return (
-          <Song
+          <Album
             isMobile={isMobile}
-            song={song}
+            album={album}
             image={
-              photos && photos[song.title] && Object.values(photos[song.title])
+              photos &&
+              photos[album.title] &&
+              Object.values(photos[album.title])
             }
-            audio={audioUrls.find((el) => el.title === song.title)}
             key={index}
+            audio={audioUrls.filter((el) => el.album === album.title)}
           />
         );
       })}
@@ -85,12 +104,13 @@ const Music = ({ width, photos, content, icons }) => {
   );
 };
 
-const Song = ({ isMobile, song, image, audio }) => {
+const Album = ({ isMobile, album, image, audio }) => {
   const styles = {
     project: {
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
       alignItems: isMobile ? 'center' : 'unset',
+      minWidth: isMobile ? 'unset' : '500px',
       boxShadow: colors.boxShadow,
       backgroundColor: colors.white,
       borderRadius: '4px',
@@ -105,6 +125,8 @@ const Song = ({ isMobile, song, image, audio }) => {
     column: {
       display: 'flex',
       flexDirection: 'column',
+      justifyContent: 'space-between',
+      padding: '0px 10px',
     },
     subtitle: {
       color: colors.lightred,
@@ -113,28 +135,52 @@ const Song = ({ isMobile, song, image, audio }) => {
       textAlign: isMobile ? 'center' : 'right',
     },
     image: {
-      margin: '10px',
+      margin: '0px 10px 0px 0px',
       width: '250px',
+      height: '250px',
+    },
+    songcontainer: {
+      maxHeight: '400px',
+      overflowY: 'scroll',
+      padding: '5px 15px',
+      backgroundColor: colors.offpink,
     },
   };
   return (
     <div css={styles.project}>
       {image && <img css={styles.image} src={image[0].src} alt='album art' />}
       <div css={styles.column}>
-        <h1 css={styles.subtitle}>{song.title}</h1>
-        {audio && (
-          <audio controls>
-            <source css={styles.player} src={audio.url} type='audio/mpeg' />
-          </audio>
-        )}
+        <h1 css={styles.subtitle}>{album.title}</h1>
+        <div css={styles.songcontainer}>
+          {audio &&
+            audio.map((song, index) => {
+              return <Song {...song} key={index} />;
+            })}
+        </div>
       </div>
     </div>
   );
 };
 
+const Song = ({ title, url }) => {
+  return (
+    <div>
+      <h3>{title}</h3>
+      <audio controls>
+        <source css={styles.player} src={url} type='audio/mpeg' />
+      </audio>
+    </div>
+  );
+};
+
 Song.propTypes = {
+  title: PropTypes.string,
+  url: PropTypes.string,
+};
+
+Album.propTypes = {
   isMobile: PropTypes.bool,
-  song: PropTypes.object,
+  album: PropTypes.object,
   image: PropTypes.array,
   audio: PropTypes.object,
 };
