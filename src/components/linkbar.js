@@ -44,7 +44,7 @@ const Linkbar = ({ links, images, backed }) => {
     },
     imageSpin: {
       height: '32px',
-      transform: 'rotate(640deg)',
+      transform: 'rotate(720deg)',
       transition: 'transform 2s',
     },
   };

@@ -5,13 +5,10 @@ import PropTypes from 'prop-types';
 import { Link, useLocation } from 'react-router-dom';
 import { jsx, keyframes, css } from '@emotion/react';
 import { colors, type, breakpoints } from '../constants';
-import { storage, db } from '../firebase';
 import burger from '../assets/burger.svg';
 
 const Navbar = ({ width }) => {
   const [isMobile, setIsMobile] = useState(width < breakpoints.tablet);
-  const [content, setContent] = useState();
-  const [resume, setResume] = useState([]);
   const [showNav, setShowNav] = useState(false);
   const [isMusic, setIsMusic] = useState(false);
   const loc = useLocation();
@@ -19,26 +16,6 @@ const Navbar = ({ width }) => {
   useEffect(() => {
     setIsMusic(loc && loc.pathname === '/music');
   }, [loc]);
-
-  useEffect(() => {
-    db.collection('general')
-      .doc('static')
-      .get()
-      .then((result) => {
-        setContent(result.data());
-      });
-  }, []);
-
-  useEffect(() => {
-    content &&
-      content.resume &&
-      storage
-        .child(content.resume)
-        .getDownloadURL()
-        .then((url) => {
-          setResume(url);
-        });
-  }, [content]);
 
   useEffect(() => {
     setIsMobile(width < breakpoints.tablet);
@@ -151,11 +128,6 @@ const Navbar = ({ width }) => {
         </li>
         <li css={styles.navItem}>
           <Link to='/music'>music</Link>
-        </li>
-        <li css={styles.navItem}>
-          <a href={resume} target='__blank'>
-            resume
-          </a>
         </li>
       </ul>
     </React.Fragment>
