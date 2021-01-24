@@ -12,6 +12,7 @@ import { useSizeListener, useDelayedUnmount } from './hooks';
 import { ContentFetchService } from './services';
 const Projects = lazy(() => import('./pages/projects/projects'));
 const Music = lazy(() => import('./pages/music/music'));
+const Blog = lazy(() => import('./pages/blog/blog'));
 
 const LOADING_DURATION = 3500;
 const FADE_OUT_DURATION = 1000;
@@ -51,9 +52,11 @@ const App = () => {
 
 const Paths = ({ width }) => {
   // cache images at the top level for quicker load times
+  // of course for a larger project i would use Redux or Context to manage this state
   const [homeContent, setHomeContent] = useState();
   const [projectsContent, setProjectsContent] = useState();
   const [musicContent, setMusicContent] = useState();
+  const [blogContent, setBlogContent] = useState();
 
   useEffect(() => {
     (async () => {
@@ -68,9 +71,16 @@ const Paths = ({ width }) => {
         ['albums', 'photo'],
         ['links', 'icon']
       );
+      const blogs = await new ContentFetchService('blog', 'static', [
+        'blogs',
+        'photos',
+        'image',
+        'caption',
+      ]);
       setHomeContent(home);
       setProjectsContent(projects);
       setMusicContent(music);
+      setBlogContent(blogs);
     })();
   }, []);
 
@@ -85,6 +95,9 @@ const Paths = ({ width }) => {
         </Route>
         <Route path='/projects'>
           <Projects width={width} {...projectsContent} />
+        </Route>
+        <Route path='/blog'>
+          <Blog width={width} {...blogContent} />
         </Route>
       </Switch>
     </Suspense>

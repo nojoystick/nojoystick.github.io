@@ -52,7 +52,7 @@ class ContentFetchService {
             });
         });
     } else {
-      // todo: obvs this will only work for a 2-item array;
+      // todo: obvs this will only work for a specific style of array;
       //    should make this work for any size of array
       this.content &&
         this.content[field[0]] &&
@@ -60,15 +60,22 @@ class ContentFetchService {
           project[field[1]] &&
             project[field[1]].forEach((photo) => {
               storage
-                .child(photo)
+                .child(field[2] ? photo[field[2]] : photo)
                 .getDownloadURL()
                 .then((url) => {
                   const img = new Image();
                   img.src = url;
+                  if (field[2]) {
+                    img.alt = photo[field[3]];
+                  }
                   if (!photos[project.title]) {
                     photos[project.title] = {};
                   }
-                  photos[project.title][photo] = img;
+                  if (field[2]) {
+                    photos[project.title][photo[field[2]]] = img;
+                  } else {
+                    photos[project.title][photo] = img;
+                  }
                 });
             });
         });
