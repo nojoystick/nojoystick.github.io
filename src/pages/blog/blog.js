@@ -1,5 +1,6 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { colors, type, breakpoints } from '../../constants';
 import { jsx } from '@emotion/react';
@@ -38,27 +39,48 @@ const styles = {
   },
 };
 
-const Blog = ({ width, content, photos }) => {
+const Blog = ({ width, content, photos, videos }) => {
+  const [sortedContent, setSortedContent] = useState([]);
   let isMobile = width < breakpoints.tablet;
+
+  useEffect(() => {
+    console.log(
+      content &&
+        content.blogs &&
+        content.blogs.sort(function (a, b) {
+          return new Date(b.date.toDate()) - new Date(a.date.toDate());
+        })
+    );
+    setSortedContent(
+      content &&
+        content.blogs && [
+          ...content.blogs.sort(function (a, b) {
+            return new Date(b.date) - new Date(a.date);
+          }),
+        ]
+    );
+  }, [content]);
 
   return content ? (
     <div css={styles.parent}>
       <h1 css={styles.title}>blog</h1>
-      {content.blogs.map((project, index) => {
-        return (
-          <Post
-            isMobile={isMobile}
-            {...project}
-            photos={
-              photos &&
-              photos[project.title] &&
-              Object.values(photos[project.title])
-            }
-            key={index}
-            index={index}
-          />
-        );
-      })}
+      {sortedContent &&
+        sortedContent.map((project, index) => {
+          return (
+            <Post
+              isMobile={isMobile}
+              {...project}
+              photos={
+                photos &&
+                photos[project.title] &&
+                Object.values(photos[project.title])
+              }
+              video={videos && videos[project.title]}
+              key={index}
+              index={index}
+            />
+          );
+        })}
     </div>
   ) : (
     <div />
@@ -69,6 +91,7 @@ Blog.propTypes = {
   width: PropTypes.number,
   content: PropTypes.object,
   photos: PropTypes.object,
+  videos: PropTypes.object,
 };
 
 export default Blog;

@@ -5,6 +5,7 @@ import { jsx } from '@emotion/react';
 import { colors, type } from '../../constants';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import ReactMarkdown from 'react-markdown';
 
 const styles = {
   title: {
@@ -120,6 +121,7 @@ const Post = ({
   subtitle,
   date,
   photos,
+  video,
   body,
   highlighted_text,
 }) => {
@@ -163,15 +165,20 @@ const Post = ({
             body.map((p, index) => {
               return (
                 <React.Fragment key={index}>
-                  <p css={styles.para} key={index}>
+                  <ReactMarkdown css={styles.para} key={index}>
                     {p}
-                  </p>
+                  </ReactMarkdown>
                   {index === 0 && (
                     <HighlightedText highlighted_text={highlighted_text} />
                   )}
                 </React.Fragment>
               );
             })}
+          {video && (
+            <video css={styles.image} controls>
+              <source css={styles.player} src={video.src} type='video/mp4' />
+            </video>
+          )}
           {photos &&
             photos.map((photo, index) => {
               console.log(photo);
@@ -222,6 +229,7 @@ Post.propTypes = {
   title: PropTypes.string,
   subtitle: PropTypes.string,
   photos: PropTypes.array,
+  video: PropTypes.array,
   index: PropTypes.number,
   highlighted_text: PropTypes.string,
   body: PropTypes.array,
