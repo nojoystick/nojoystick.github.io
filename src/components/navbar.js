@@ -129,9 +129,9 @@ const Navbar = ({ width }) => {
         <li css={styles.navItem}>
           <Link to='/music'>music</Link>
         </li>
-        {/* <li css={styles.navItem}>
+        <li css={styles.navItem}>
           <Link to='/blog'>blog</Link>
-        </li> */}
+        </li>
       </ul>
     </React.Fragment>
   );

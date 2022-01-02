@@ -203,6 +203,7 @@ const HighlightedText = ({ highlighted_text }) => {
   return (
     <div css={styles.highlightedText}>
       {highlightedTextArr.map((text, index) => {
+        const isLink = text.includes('http');
         return (
           <span
             css={
@@ -212,7 +213,7 @@ const HighlightedText = ({ highlighted_text }) => {
             }
             key={index}
           >
-            {text}
+            {isLink ? <a href={text}>{text}</a> : text}
           </span>
         );
       })}
