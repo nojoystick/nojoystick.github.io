@@ -127,7 +127,7 @@ const Loading = ({ show }) => {
       height: BASE_CIRCLE_SIZE,
     },
   };
-  const fullName = 'elaine williams';
+  const fullName = 'elaine';
   const name = useTypewriter(fullName, 30, 500);
 
   return (
